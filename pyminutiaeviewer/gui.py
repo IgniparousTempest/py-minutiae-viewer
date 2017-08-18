@@ -1,5 +1,6 @@
 import traceback
-from tkinter import Frame, Button, W, E, N, S, Label, RAISED, StringVar, Radiobutton
+from tkinter.ttk import Frame, Button, Label, Radiobutton, Style
+from tkinter import W, E, N, S,  RAISED, StringVar
 from tkinter.filedialog import askopenfilename, sys
 from tkinter.messagebox import showerror
 
@@ -12,6 +13,8 @@ from pyminutiaeviewer.minutiae_reader import MinutiaeReader, MinutiaeFileFormat
 class Root(Frame):
     def __init__(self):
         Frame.__init__(self)
+        s = Style()
+        s.theme_use("clam")
         self.master.title("Py Minutiae Viewer")
         self.grid(sticky=W + E + N + S)
 
