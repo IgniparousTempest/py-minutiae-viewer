@@ -1,6 +1,6 @@
 import traceback
 from tkinter.ttk import Frame, Button, Label, Radiobutton, Style
-from tkinter import W, E, N, S,  RAISED, StringVar
+from tkinter import W, E, N, S, NSEW, RAISED, StringVar
 from tkinter.filedialog import askopenfilename, sys
 from tkinter.messagebox import showerror
 
@@ -11,18 +11,20 @@ from pyminutiaeviewer.minutiae_reader import MinutiaeReader, MinutiaeFileFormat
 
 
 class Root(Frame):
-    def __init__(self):
-        Frame.__init__(self)
+    def __init__(self, master):
+        Frame.__init__(self, master)
         s = Style()
         s.theme_use("clam")
-        self.master.title("Py Minutiae Viewer")
-        self.grid(sticky=W + E + N + S)
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.grid(sticky=NSEW)
 
         self.minutiae_file_format = StringVar()
         self.minutiae = None
 
-        self.control_panel = ControlPanel(self, self.load_fingerprint_image, self.load_minutiae_file, self.draw_minutiae, self.minutiae_file_format)
-        self.control_panel.grid(row=0, column=0, sticky=W + E + N + S)
+        self.control_panel = ControlPanel(self, self.load_fingerprint_image, self.load_minutiae_file,
+                                          self.draw_minutiae, self.minutiae_file_format)
+        self.control_panel.grid(row=0, column=0, sticky=NSEW)
 
         self.image_raw = Image.new('RGBA', (512, 512), (255, 255, 255, 255))
         self.image_minutiae = None
@@ -75,26 +77,37 @@ class Root(Frame):
 
 class ControlPanel(Frame):
     def __init__(self, parent, load_fingerprint_func, load_minutiae_func, draw_minutiae_func, minutiae_format):
-        Frame.__init__(self, parent, relief=RAISED, borderwidth=1)
+        Frame.__init__(self, parent, borderwidth=1)
+        self.columnconfigure(0, weight=1)
+
         self.mode_label = Label(self, text="Display Pre-calculated Minutiae")
         self.mode_label.grid(row=0, column=0, sticky=N)
 
         self.mode_button = Button(self, text="Change Mode", command=None)
-        self.mode_button.grid(row=1, column=0, sticky=N+W+E)
+        self.mode_button.grid(row=1, column=0, sticky=N + W + E)
+
+        self.controls_frame = PreCalculatedFrame(self, load_fingerprint_func, load_minutiae_func, draw_minutiae_func, minutiae_format)
+        self.controls_frame.grid(row=2, column=0, pady=(10, 0), sticky=N + W + E)
+
+
+class PreCalculatedFrame(Frame):
+    def __init__(self, parent, load_fingerprint_func, load_minutiae_func, draw_minutiae_func, minutiae_format):
+        Frame.__init__(self, parent, relief=RAISED, borderwidth=1)
+        self.columnconfigure(0, weight=1)
 
         self.open_fingerprint_image_button = Button(self, text="Open Fingerprint Image", command=load_fingerprint_func)
-        self.open_fingerprint_image_button.grid(row=2, column=0, sticky=N+W+E)
+        self.open_fingerprint_image_button.grid(row=0, column=0, sticky=N + W + E)
 
         self.radio_label = Label(self, text="Minutiae File Format:")
-        self.radio_label.grid(row=3, column=0, sticky=N)
+        self.radio_label.grid(row=1, column=0, sticky=N)
         self.radio_simple = Radiobutton(self, text="Simple", variable=minutiae_format, value="Simple")
-        self.radio_simple.grid(row=4, column=0, sticky=W)
+        self.radio_simple.grid(row=2, column=0, sticky=W)
         self.radio_nbist = Radiobutton(self, text="NBIST/MINDTC", variable=minutiae_format, value="NBIST")
-        self.radio_nbist.grid(row=5, column=0, sticky=W)
+        self.radio_nbist.grid(row=3, column=0, sticky=W)
         minutiae_format.set("NBIST")
 
         self.open_minutiae_txt_button = Button(self, text="Open Minutiae File", command=load_minutiae_func)
-        self.open_minutiae_txt_button.grid(row=6, column=0, sticky=N+W+E)
+        self.open_minutiae_txt_button.grid(row=4, column=0, sticky=N + W + E)
 
         self.draw_minutiae = Button(self, text="Draw Minutiae", command=draw_minutiae_func)
-        self.draw_minutiae.grid(row=7, column=0, sticky=N+W+E)
+        self.draw_minutiae.grid(row=5, column=0, sticky=N + W + E)
