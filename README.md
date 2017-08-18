@@ -1,5 +1,5 @@
 # Open Fingerprint Minutiae Viewer
-Open Fingerprint Minutiae Viewer is a cross-platform, open-source, multi-format minutiae viewer. It is an alternative to the FpMV by the NBIST.
+Open Fingerprint Minutiae Viewer is a cross-platform, open-source, multi-format minutiae viewer. It is an alternative to the [FpMV](https://www.nist.gov/services-resources/software/fingerprint-minutiae-viewer-fpmv) by the NBIST.
 
 ## How to Install
 
