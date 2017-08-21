@@ -1,7 +1,59 @@
-from tkinter import Canvas
+from tkinter.filedialog import askopenfilename
+from tkinter.ttk import Frame, Button
+from tkinter import Canvas, NSEW, N, W, RAISED, E
 from typing import Tuple
 
-from PIL import Image
+from PIL import Image, ImageTk
+
+
+class NotebookTabBase(Frame):
+    def __init__(self, parent):
+        Frame.__init__(self, parent)
+        self.columnconfigure(1, weight=1)
+        self.rowconfigure(0, weight=1)
+        self.grid(sticky=NSEW)
+
+        self.minutiae = None
+        self.image_minutiae = None
+
+        self.image_raw = Image.new('RGBA', (512, 512), (255, 255, 255, 255))
+        self.image = ImageTk.PhotoImage(self.image_raw)
+
+        self.controls_frame = None
+
+        self.image_canvas = Canvas(self, bd=0, highlightthickness=0)
+        self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
+        self.image_canvas.grid(row=0, column=1, sticky=NSEW)
+        self.bind("<Configure>", self.resize)
+
+    def set_controls(self, controls_frame):
+        self.controls_frame = controls_frame
+        self.controls_frame.grid(row=0, column=0, sticky=NSEW)
+
+    def resize(self, event):
+        resized, _ = scale_image_to_fit_minutiae_canvas(self.image_canvas, self.image_raw)
+        self.image = ImageTk.PhotoImage(resized)
+        self.image_canvas.delete("IMG")
+        self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
+
+    def load_fingerprint_image(self):
+        file_path = askopenfilename(filetypes=(("Image files", ('*.bmp', '*.jpeg', '*.jpg', '*.png')),
+                                               ("All files", "*.*")))
+        if file_path:
+            self.image_raw = Image.open(file_path).convert("RGBA")
+            self.image = ImageTk.PhotoImage(self.image_raw)
+            self.image_minutiae = None
+            self.image_canvas.delete("IMG")
+            self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
+            self.resize(None)
+            self.update_idletasks()
+
+
+class ControlsFrameBase(Frame):
+    def __init__(self, parent, load_fingerprint_func):
+        Frame.__init__(self, parent, relief=RAISED, borderwidth=1)
+        self.open_fingerprint_image_button = Button(self, text="Open Fingerprint Image", command=load_fingerprint_func)
+        self.open_fingerprint_image_button.grid(row=0, column=0, sticky=N + W + E)
 
 
 def aspect_ratio_for_scaling(canvas_size: Tuple[int, int], image_size: Tuple[int, int]) -> float:

@@ -1,60 +1,33 @@
 import traceback
-from tkinter import W, N, E, StringVar, NSEW, Canvas, RAISED
+from tkinter import W, N, E, StringVar
 from tkinter.filedialog import askopenfilename, sys
 from tkinter.messagebox import showerror
-from tkinter.ttk import Frame, Button, Label, Radiobutton
+from tkinter.ttk import Button, Label, Radiobutton
 
-from PIL import ImageTk, Image
+from PIL import ImageTk
 
-from pyminutiaeviewer.gui_common import scale_image_to_fit_minutiae_canvas
+from pyminutiaeviewer.gui_common import scale_image_to_fit_minutiae_canvas, NotebookTabBase, ControlsFrameBase
 from pyminutiaeviewer.minutia import Minutia
 from pyminutiaeviewer.minutiae_drawing import draw_minutiae
 from pyminutiaeviewer.minutiae_reader import MinutiaeReader, MinutiaeFileFormat
 
 
-class DrawFromFile(Frame):
+class DrawFromFile(NotebookTabBase):
     def __init__(self, parent):
-        Frame.__init__(self, parent)
-        self.columnconfigure(1, weight=1)
-        self.rowconfigure(0, weight=1)
-        self.grid(sticky=NSEW)
+        NotebookTabBase.__init__(self, parent)
 
         self.minutiae_file_format = StringVar()
-        self.minutiae = None
 
-        self.image_raw = Image.new('RGBA', (512, 512), (255, 255, 255, 255))
-        self.image_minutiae = None
-        self.image = ImageTk.PhotoImage(self.image_raw)
+        controls = ControlsFrame(self, self.load_fingerprint_image, self.minutiae_file_format,
+                                 self.load_minutiae_file, self.draw_minutiae)
 
-        self.controls_frame = ControlsFrame(self, self.load_fingerprint_image, self.minutiae_file_format,
-                                            self.load_minutiae_file, self.draw_minutiae)
-        self.controls_frame.grid(row=0, column=0, sticky=NSEW)
-
-        self.image_canvas = Canvas(self, bd=0, highlightthickness=0)
-        self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
-        self.image_canvas.grid(row=0, column=1, sticky=NSEW)
-        self.bind("<Configure>", self.resize)
+        self.set_controls(controls)
 
     def resize(self, event):
         if self.image_minutiae is not None:
             self.draw_minutiae()
             return
-        resized, _ = scale_image_to_fit_minutiae_canvas(self.image_canvas, self.image_raw)
-        self.image = ImageTk.PhotoImage(resized)
-        self.image_canvas.delete("IMG")
-        self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
-
-    def load_fingerprint_image(self):
-        file_path = askopenfilename(filetypes=(("Image files", ('*.bmp', '*.jpeg', '*.jpg', '*.png')),
-                                               ("All files", "*.*")))
-        if file_path:
-            self.image_raw = Image.open(file_path).convert("RGBA")
-            self.image = ImageTk.PhotoImage(self.image_raw)
-            self.image_minutiae = None
-            self.image_canvas.delete("IMG")
-            self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
-            self.resize(None)
-            self.update_idletasks()
+        super(self.__class__, self).resize(event)
 
     def load_minutiae_file(self):
         file_path = askopenfilename(filetypes=(("Text files", ('*.txt', '*.min')),
@@ -93,11 +66,9 @@ class DrawFromFile(Frame):
         self.update_idletasks()
 
 
-class ControlsFrame(Frame):
+class ControlsFrame(ControlsFrameBase):
     def __init__(self, parent, load_fingerprint_func, minutiae_format, load_minutiae_func, draw_minutiae_func):
-        Frame.__init__(self, parent, relief=RAISED, borderwidth=1)
-        self.open_fingerprint_image_button = Button(self, text="Open Fingerprint Image", command=load_fingerprint_func)
-        self.open_fingerprint_image_button.grid(row=0, column=0, sticky=N + W + E)
+        ControlsFrameBase.__init__(self, parent, load_fingerprint_func)
 
         self.radio_label = Label(self, text="Minutiae File Format:")
         self.radio_label.grid(row=1, column=0, sticky=N)
