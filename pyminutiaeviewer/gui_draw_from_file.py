@@ -43,8 +43,10 @@ class ControlsFrame(ControlsFrameBase):
     def __init__(self, parent, load_fingerprint_func, minutiae_format, load_minutiae_func, draw_minutiae_func):
         ControlsFrameBase.__init__(self, parent, load_fingerprint_func)
 
+        self.open_fingerprint_image_button.grid(row=0, column=0, columnspan=2, sticky=N + W + E)
+
         self.radio_label = Label(self, text="Minutiae File Format:")
-        self.radio_label.grid(row=1, column=0, sticky=N)
+        self.radio_label.grid(row=1, column=0, columnspan=2, sticky=N)
         self.minutiae_format_options = OptionMenu(self, minutiae_format, "NBIST/MINDTCT", "Simple", "NBIST/MINDTCT")
         self.minutiae_format_options.grid(row=2, column=0, sticky=N + W + E)
 
@@ -52,4 +54,4 @@ class ControlsFrame(ControlsFrameBase):
         self.open_minutiae_txt_btn.grid(row=2, column=1, sticky=N + W + E)
 
         self.draw_minutiae_btn = Button(self, text="Draw Minutiae", command=draw_minutiae_func)
-        self.draw_minutiae_btn.grid(row=3, column=0, sticky=N + W + E)
+        self.draw_minutiae_btn.grid(row=3, column=0, columnspan=2, sticky=N + W + E)
