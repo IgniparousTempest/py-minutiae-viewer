@@ -35,6 +35,10 @@ class NotebookTabBase(Frame):
         self.controls_frame.grid(row=0, column=0, sticky=NSEW)
 
     def resize(self, event):
+        if self.image_minutiae is not None:
+            self.draw_minutiae()
+            return
+        
         resized, _ = scale_image_to_fit_minutiae_canvas(self.image_canvas, self.image_raw)
         self.image = ImageTk.PhotoImage(resized)
         self.image_canvas.delete("IMG")

@@ -19,12 +19,6 @@ class DrawFromFile(NotebookTabBase):
 
         self.set_controls(controls)
 
-    def resize(self, event):
-        if self.image_minutiae is not None:
-            self.draw_minutiae()
-            return
-        super(self.__class__, self).resize(event)
-
     def load_minutiae_file(self):
         file_path = askopenfilename(filetypes=(("Text files", ('*.txt', '*.min')),
                                                ("All files", "*.*")))
