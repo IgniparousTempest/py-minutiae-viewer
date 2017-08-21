@@ -2,7 +2,7 @@ import traceback
 from tkinter import W, N, E, StringVar
 from tkinter.filedialog import askopenfilename, sys
 from tkinter.messagebox import showerror
-from tkinter.ttk import Button, Label, Radiobutton
+from tkinter.ttk import Button, Label, OptionMenu
 
 from pyminutiaeviewer.gui_common import NotebookTabBase, ControlsFrameBase
 from pyminutiaeviewer.minutiae_reader import MinutiaeReader, MinutiaeFileFormat
@@ -25,7 +25,7 @@ class DrawFromFile(NotebookTabBase):
         if file_path:
             if self.minutiae_file_format.get() == "Simple":
                 reader = MinutiaeReader(MinutiaeFileFormat.SIMPLE)
-            elif self.minutiae_file_format.get() == "NBIST":
+            elif self.minutiae_file_format.get() == "NBIST/MINDTCT":
                 reader = MinutiaeReader(MinutiaeFileFormat.NBIST)
             else:
                 print("The File Type was not set", file=sys.stderr)
@@ -45,14 +45,11 @@ class ControlsFrame(ControlsFrameBase):
 
         self.radio_label = Label(self, text="Minutiae File Format:")
         self.radio_label.grid(row=1, column=0, sticky=N)
-        self.radio_simple = Radiobutton(self, text="Simple", variable=minutiae_format, value="Simple")
-        self.radio_simple.grid(row=2, column=0, sticky=W)
-        self.radio_nbist = Radiobutton(self, text="NBIST/MINDTC", variable=minutiae_format, value="NBIST")
-        self.radio_nbist.grid(row=3, column=0, sticky=W)
-        minutiae_format.set("NBIST")
+        self.minutiae_format_options = OptionMenu(self, minutiae_format, "NBIST/MINDTCT", "Simple", "NBIST/MINDTCT")
+        self.minutiae_format_options.grid(row=2, column=0, sticky=N + W + E)
 
         self.open_minutiae_txt_btn = Button(self, text="Open Minutiae File", command=load_minutiae_func)
-        self.open_minutiae_txt_btn.grid(row=4, column=0, sticky=N + W + E)
+        self.open_minutiae_txt_btn.grid(row=2, column=1, sticky=N + W + E)
 
         self.draw_minutiae_btn = Button(self, text="Draw Minutiae", command=draw_minutiae_func)
-        self.draw_minutiae_btn.grid(row=5, column=0, sticky=N + W + E)
+        self.draw_minutiae_btn.grid(row=3, column=0, sticky=N + W + E)
