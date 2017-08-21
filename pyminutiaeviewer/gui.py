@@ -24,9 +24,11 @@ class Root(Frame):
         self.minutiae_file_format = StringVar()
         self.minutiae = None
 
-        self.control_panel = ControlPanel(self, self.load_fingerprint_image, self.load_minutiae_file,
-                                          self.draw_minutiae, self.minutiae_file_format)
+        self.control_panel = Notebook(self)
+        # self.control_panel = ControlPanel(self, self.load_fingerprint_image, self.load_minutiae_file,
+        #                                   self.draw_minutiae, self.minutiae_file_format)
         self.control_panel.grid(row=0, column=0, sticky=NSEW)
+        self.control_panel.add(DrawFromFile(self, self.load_fingerprint_image, self.load_minutiae_file, self.draw_minutiae, self.minutiae_file_format), text="Draw from File")
 
         self.image_raw = Image.new('RGBA', (512, 512), (255, 255, 255, 255))
         self.image_minutiae = None
@@ -97,25 +99,9 @@ class Root(Frame):
         self.update_idletasks()
 
 
-class ControlPanel(Frame):
+class DrawFromFile(Frame):
     def __init__(self, parent, load_fingerprint_func, load_minutiae_func, draw_minutiae_func, minutiae_format):
-        Frame.__init__(self, parent, borderwidth=1)
-        self.columnconfigure(0, weight=1)
-
-        self.mode_label = Label(self, text="Display Pre-calculated Minutiae")
-        self.mode_label.grid(row=0, column=0, sticky=N)
-
-        self.mode_button = Button(self, text="Change Mode", command=None)
-        self.mode_button.grid(row=1, column=0, sticky=N + W + E)
-
-        self.controls_frame = PreCalculatedFrame(self, load_fingerprint_func, load_minutiae_func, draw_minutiae_func,
-                                                 minutiae_format)
-        self.controls_frame.grid(row=2, column=0, pady=(10, 0), sticky=N + W + E)
-
-
-class PreCalculatedFrame(Frame):
-    def __init__(self, parent, load_fingerprint_func, load_minutiae_func, draw_minutiae_func, minutiae_format):
-        Frame.__init__(self, parent, relief=RAISED, borderwidth=1)
+        Frame.__init__(self, parent)
         self.columnconfigure(0, weight=1)
 
         self.open_fingerprint_image_button = Button(self, text="Open Fingerprint Image", command=load_fingerprint_func)
