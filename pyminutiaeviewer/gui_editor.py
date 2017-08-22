@@ -1,8 +1,9 @@
 import traceback
-from tkinter import W, N, E, StringVar
+from pathlib import Path
+from tkinter import W, N, E, StringVar, PhotoImage
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter.messagebox import showerror
-from tkinter.ttk import Button, Label
+from tkinter.ttk import Button, Label, LabelFrame
 
 import math
 
@@ -137,7 +138,6 @@ class MinutiaeEditorFrame(NotebookTabBase):
         x, y = event.x, event.y  # TODO: SCALE THIS
 
         scale_factor = self.image_raw.width / self.image.width()
-        print(scale_factor)
 
         ((px, py), minutiae_type) = self.current_minutiae
         angle = math.degrees(math.atan2(y - py, x - px)) + 90
@@ -160,5 +160,27 @@ class ControlsFrame(ControlsFrameBase):
         self.export_minutiae_btn = Button(self, text="Export Minutiae", command=save_minutiae_func)
         self.export_minutiae_btn.grid(row=2, column=0, sticky=N + W + E)
 
+        self.info_frame = InfoFrame(self, "Info", minutiae_count)
+        self.info_frame.grid(row=3, column=0, padx=4, sticky=N + W + E)
+
+
+class InfoFrame(LabelFrame):
+    def __init__(self, parent, title, minutiae_count):
+        super(self.__class__, self).__init__(parent, text=title)
+
         self.current_number_minutiae_label = Label(self, textvariable=minutiae_count)
-        self.current_number_minutiae_label.grid(row=3, column=0, sticky=N + W + E)
+        self.current_number_minutiae_label.grid(row=0, column=0, sticky=N + W + E)
+
+        self.bifurcation_label = Label(self, text="Bifurcation (LMB):")
+        self.bifurcation_label.grid(row=1, column=0, sticky=W)
+
+        self.bifurcation_image = PhotoImage(file=Path(__file__).resolve().parent / 'images' / 'bifurcation.png')
+        self.bifurcation_image_label = Label(self, image=self.bifurcation_image)
+        self.bifurcation_image_label.grid(row=2, column=0, sticky=W)
+
+        self.ridge_ending_label = Label(self, text="Ridge Ending (CTRL + LMB):")
+        self.ridge_ending_label.grid(row=3, column=0, sticky=W)
+
+        self.ridge_ending_image = PhotoImage(file=Path(__file__).resolve().parent / 'images' / 'ridge_ending.png')
+        self.ridge_ending_image_label = Label(self, image=self.ridge_ending_image)
+        self.ridge_ending_image_label.grid(row=4, column=0, sticky=W)
