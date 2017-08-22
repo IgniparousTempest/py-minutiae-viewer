@@ -81,7 +81,8 @@ def _parse_nbist_format(lines: List[str]) -> List[Minutia]:
 
     # Ensure the number of minutiae read is the expected number:
     if len(minutiae) != num_minutiae:
-        raise CorruptFileError("The file declared there would be  {} minutiae, but only read {}.")
+        raise CorruptFileError("The file declared there would be  {} minutiae, but only read {}."
+                               .format(num_minutiae, len(minutiae)))
 
     return minutiae
 
