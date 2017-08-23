@@ -78,7 +78,7 @@ class MinutiaeEditorFrame(NotebookTabBase):
                 return
 
             try:
-                self.minutiae = writer.write(file_path, self.minutiae, self.image_raw)
+                writer.write(file_path, self.minutiae, self.image_raw)
             except Exception as e:
                 traceback.print_exc()
                 showerror("Save Minutiae File", "There was an error in saving the minutiae file.\n\n"
