@@ -61,7 +61,8 @@ class NotebookTabBase(Frame):
             self.update_idletasks()
 
     def load_minutiae_file(self):
-        file_path = askopenfilename(filetypes=(("Simple minutiae file", '*.sim'),
+        file_path = askopenfilename(filetypes=(("All minutiae files", ('*.min', '*.sim')),
+                                               ("Simple minutiae file", '*.sim'),
                                                ("NBIST minutiae file", '*.min'),
                                                ("All files", "*.*")))
         if file_path:
