@@ -40,10 +40,19 @@ class MinutiaeEditorFrame(NotebookTabBase):
         self.image_canvas.bind("<Button-3>", self.click_remove_minutia)
 
     def load_minutiae_file(self):
-        file_path = askopenfilename(filetypes=(("NBIST minutiae file", '*.min'),
+        file_path = askopenfilename(filetypes=(("Simple minutiae file", '*.sim'),
+                                               ("NBIST minutiae file", '*.min'),
                                                ("All files", "*.*")))
         if file_path:
-            reader = MinutiaeReader(MinutiaeFileFormat.NBIST)
+            # Select the correct file format
+            if Path(file_path).suffix == '.sim':
+                reader = MinutiaeReader(MinutiaeFileFormat.SIMPLE)
+            elif Path(file_path).suffix == '.min':
+                reader = MinutiaeReader(MinutiaeFileFormat.NBIST)
+            else:
+                showerror("Read Minutiae File", "The chosen file had an extension of '{}', which can't be interpreted."
+                          .format(Path(file_path).suffix))
+                return
 
             try:
                 self.minutiae = reader.read(file_path)
@@ -55,10 +64,18 @@ class MinutiaeEditorFrame(NotebookTabBase):
                                                 "The error message was:\n{}".format(e))
 
     def save_minutiae_file(self):
-        file_path = asksaveasfilename(filetypes=(("NBIST minutiae file", '*.min'),
-                                                 ("All files", "*.*")))
+        file_path = asksaveasfilename(filetypes=(("Simple minutiae file", '*.sim'),
+                                                 ("NBIST minutiae file", '*.min')))
         if file_path:
-            writer = MinutiaeEncoder(MinutiaeFileFormat.NBIST)
+            # Select the correct file format
+            if Path(file_path).suffix == '.sim':
+                writer = MinutiaeEncoder(MinutiaeFileFormat.SIMPLE)
+            elif Path(file_path).suffix == '.min':
+                writer = MinutiaeEncoder(MinutiaeFileFormat.NBIST)
+            else:
+                showerror("Save Minutiae File", "The chosen file had an extension of '{}', which can't be interpreted."
+                          .format(Path(file_path).suffix))
+                return
 
             try:
                 self.minutiae = writer.write(file_path, self.minutiae, self.image_raw)
