@@ -7,8 +7,6 @@ from pyminutiaeviewer.gui_editor import MinutiaeEditorFrame
 class Root(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
-        s = Style()
-        s.theme_use("clam")
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
         self.grid(sticky=NSEW)

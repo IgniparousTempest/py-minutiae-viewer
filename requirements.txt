@@ -1,1 +1,2 @@
 Pillow>=4.2.1
+ttkthemes>=1.5.0

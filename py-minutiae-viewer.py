@@ -1,9 +1,16 @@
+import platform
+
 from pathlib import Path
-from tkinter import Tk, PhotoImage
+from tkinter import PhotoImage
+from ttkthemes import ThemedTk
 
 from pyminutiaeviewer import gui
 
-root = Tk()
+root = ThemedTk()
+if platform.system() is 'Windows':
+    root.set_theme("vista")
+else:
+    root.set_theme("clearlooks")
 root.rowconfigure(0, weight=1)
 root.columnconfigure(0, weight=1)
 root.title("Py Minutiae Viewer")
