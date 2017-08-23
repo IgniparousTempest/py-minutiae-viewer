@@ -1,3 +1,5 @@
+import traceback
+from pathlib import Path
 from tkinter.filedialog import askopenfilename
 from tkinter.messagebox import showerror
 from tkinter.ttk import Frame, Button
@@ -8,6 +10,7 @@ from PIL import Image, ImageTk
 
 from pyminutiaeviewer.minutia import Minutia
 from pyminutiaeviewer.minutiae_drawing import draw_minutiae
+from pyminutiaeviewer.minutiae_reader import MinutiaeReader, MinutiaeFileFormat
 
 
 class NotebookTabBase(Frame):
@@ -55,6 +58,29 @@ class NotebookTabBase(Frame):
             self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
             self.resize(None)
             self.update_idletasks()
+
+    def load_minutiae_file(self):
+        file_path = askopenfilename(filetypes=(("Simple minutiae file", '*.sim'),
+                                               ("NBIST minutiae file", '*.min'),
+                                               ("All files", "*.*")))
+        if file_path:
+            # Select the correct file format
+            if Path(file_path).suffix == '.sim':
+                reader = MinutiaeReader(MinutiaeFileFormat.SIMPLE)
+            elif Path(file_path).suffix == '.min':
+                reader = MinutiaeReader(MinutiaeFileFormat.NBIST)
+            else:
+                showerror("Read Minutiae File", "The chosen file had an extension of '{}', which can't be interpreted."
+                          .format(Path(file_path).suffix))
+                return
+
+            try:
+                self.minutiae = reader.read(file_path)
+                self.draw_minutiae()
+            except Exception as e:
+                traceback.print_exc()
+                showerror("Read Minutiae File", "There was an error in reading the minutiae file.\n\n"
+                                                "The error message was:\n{}".format(e))
 
     def draw_minutiae(self):
         if self.minutiae is None:

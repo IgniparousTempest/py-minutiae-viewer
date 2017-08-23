@@ -1,11 +1,10 @@
+import math
 import traceback
 from pathlib import Path
 from tkinter import W, N, E, StringVar, PhotoImage
-from tkinter.filedialog import askopenfilename, asksaveasfilename
+from tkinter.filedialog import asksaveasfilename
 from tkinter.messagebox import showerror
 from tkinter.ttk import Button, Label, LabelFrame
-
-import math
 
 from PIL import ImageTk
 
@@ -13,19 +12,18 @@ from pyminutiaeviewer.gui_common import NotebookTabBase, ControlsFrameBase, scal
 from pyminutiaeviewer.minutia import Minutia, MinutiaType
 from pyminutiaeviewer.minutiae_drawing import draw_minutiae
 from pyminutiaeviewer.minutiae_encoder import MinutiaeEncoder
-from pyminutiaeviewer.minutiae_reader import MinutiaeReader, MinutiaeFileFormat
+from pyminutiaeviewer.minutiae_reader import MinutiaeFileFormat
 
 
 class MinutiaeEditorFrame(NotebookTabBase):
     def __init__(self, parent):
         super(self.__class__, self).__init__(parent)
 
-        self.minutiae_file_format = StringVar()
         self.minutiae_count = StringVar()
 
         self.minutiae = []
 
-        controls = ControlsFrame(self, self.load_fingerprint_image, self.minutiae_file_format, self.load_minutiae_file,
+        controls = ControlsFrame(self, self.load_fingerprint_image, self.load_minutiae_file,
                                  self.save_minutiae_file, self.minutiae_count)
 
         self.set_controls(controls)
@@ -40,28 +38,8 @@ class MinutiaeEditorFrame(NotebookTabBase):
         self.image_canvas.bind("<Button-3>", self.click_remove_minutia)
 
     def load_minutiae_file(self):
-        file_path = askopenfilename(filetypes=(("Simple minutiae file", '*.sim'),
-                                               ("NBIST minutiae file", '*.min'),
-                                               ("All files", "*.*")))
-        if file_path:
-            # Select the correct file format
-            if Path(file_path).suffix == '.sim':
-                reader = MinutiaeReader(MinutiaeFileFormat.SIMPLE)
-            elif Path(file_path).suffix == '.min':
-                reader = MinutiaeReader(MinutiaeFileFormat.NBIST)
-            else:
-                showerror("Read Minutiae File", "The chosen file had an extension of '{}', which can't be interpreted."
-                          .format(Path(file_path).suffix))
-                return
-
-            try:
-                self.minutiae = reader.read(file_path)
-                self.draw_minutiae()
-                self._update_minutiae_count()
-            except Exception as e:
-                traceback.print_exc()
-                showerror("Read Minutiae File", "There was an error in reading the minutiae file.\n\n"
-                                                "The error message was:\n{}".format(e))
+        super(self.__class__, self).load_minutiae_file()
+        self._update_minutiae_count()
 
     def save_minutiae_file(self):
         file_path = asksaveasfilename(filetypes=(("Simple minutiae file", '*.sim'),
@@ -152,7 +130,7 @@ class MinutiaeEditorFrame(NotebookTabBase):
         self._update_minutiae_count()
 
     def click_add_minutiae(self, event):
-        x, y = event.x, event.y  # TODO: SCALE THIS
+        x, y = event.x, event.y
 
         scale_factor = self.image_raw.width / self.image.width()
 
@@ -167,8 +145,7 @@ class MinutiaeEditorFrame(NotebookTabBase):
 
 
 class ControlsFrame(ControlsFrameBase):
-    def __init__(self, parent, load_fingerprint_func, minutiae_format, load_minutiae_func, save_minutiae_func,
-                 minutiae_count):
+    def __init__(self, parent, load_fingerprint_func, load_minutiae_func, save_minutiae_func, minutiae_count):
         super(self.__class__, self).__init__(parent, load_fingerprint_func)
 
         self.load_minutiae_btn = Button(self, text="Load Minutiae", command=load_minutiae_func)
