@@ -8,12 +8,12 @@ Open Fingerprint Minutiae Viewer is a cross-platform, open-source, multi-format 
 There are two modes:
 
 1. Extraction mode: This loads an image and uses MINDTCT to extract and display minutiae.
-1. Pre-calculated mode: This does not calculate minutiae from the image, instead it draws minutiae from an external file over the image.
-
-## How to Use
+2. Editor mode: This allows you to manually edit the detected minutiae or minutiae loaded from an external file.
 
 ## Screenshots
 
-![Screenshot of Pre-calculated Mode](.readme/Screenshot_precalculated.png)
+![Screenshot of Editor Mode](.readme/Screenshot_editor.png)
 
-The above screenshot shows the application in `pre-calculated mode`, drawing minutiae from an external file over a fingerprint image. 
+The above screenshot shows the application in `editor mode`, the minutiae have been detected with an external minutiae detection algorithm. Now false positives are being removed and false negatives are being labeled.
+
+## How to Use
