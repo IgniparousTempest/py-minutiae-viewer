@@ -8,18 +8,14 @@ class DrawFromFile(NotebookTabBase):
     def __init__(self, parent):
         NotebookTabBase.__init__(self, parent)
 
-        controls = ControlsFrame(self, self.load_fingerprint_image,
-                                 self.load_minutiae_file, self.draw_minutiae)
+        controls = ControlsFrame(self, self.load_fingerprint_image, self.load_minutiae_file)
 
         self.set_controls(controls)
 
 
 class ControlsFrame(ControlsFrameBase):
-    def __init__(self, parent, load_fingerprint_func, load_minutiae_func, draw_minutiae_func):
+    def __init__(self, parent, load_fingerprint_func, load_minutiae_func):
         ControlsFrameBase.__init__(self, parent, load_fingerprint_func)
 
         self.open_minutiae_txt_btn = Button(self, text="Open Minutiae File", command=load_minutiae_func)
         self.open_minutiae_txt_btn.grid(row=1, column=0, sticky=N + W + E)
-
-        self.draw_minutiae_btn = Button(self, text="Draw Minutiae", command=draw_minutiae_func)
-        self.draw_minutiae_btn.grid(row=2, column=0, sticky=N + W + E)

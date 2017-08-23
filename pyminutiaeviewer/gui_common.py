@@ -20,7 +20,7 @@ class NotebookTabBase(Frame):
         self.rowconfigure(0, weight=1)
         self.grid(sticky=NSEW)
 
-        self.minutiae = None
+        self.minutiae = []
         self.image_minutiae = None
 
         self.image_raw = Image.new('RGBA', (512, 512), (255, 255, 255, 255))
@@ -57,6 +57,7 @@ class NotebookTabBase(Frame):
             self.image_canvas.delete("IMG")
             self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
             self.resize(None)
+            self.minutiae = []
             self.update_idletasks()
 
     def load_minutiae_file(self):
@@ -83,13 +84,6 @@ class NotebookTabBase(Frame):
                                                 "The error message was:\n{}".format(e))
 
     def draw_minutiae(self):
-        if self.minutiae is None:
-            showerror("Draw Minutiae", "The minutiae file has not been set.")
-            return
-        if self.image_raw is None:
-            showerror("Draw Minutiae", "The image file has not been set.")
-            return
-
         scaled_raw_image, ratio = scale_image_to_fit_minutiae_canvas(self.image_canvas, self.image_raw)
         minutiae = [Minutia(int(m.x * ratio), int(m.y * ratio), m.angle, m.minutia_type) for m in self.minutiae]
         self.image_minutiae = draw_minutiae(scaled_raw_image, minutiae)

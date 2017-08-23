@@ -20,8 +20,7 @@ class MinutiaeEditorFrame(NotebookTabBase):
         super(self.__class__, self).__init__(parent)
 
         self.minutiae_count = StringVar()
-
-        self.minutiae = []
+        self.minutiae_count = StringVar()
 
         controls = ControlsFrame(self, self.load_fingerprint_image, self.load_minutiae_file,
                                  self.save_minutiae_file, self.minutiae_count)
@@ -36,6 +35,10 @@ class MinutiaeEditorFrame(NotebookTabBase):
         self.image_canvas.bind("<B1-Motion>", self.click_select_angle)
         self.image_canvas.bind("<ButtonRelease-1>", self.click_add_minutiae)
         self.image_canvas.bind("<Button-3>", self.click_remove_minutia)
+
+    def load_fingerprint_image(self):
+        super(self.__class__, self).load_fingerprint_image()
+        self._update_minutiae_count()
 
     def load_minutiae_file(self):
         super(self.__class__, self).load_minutiae_file()
