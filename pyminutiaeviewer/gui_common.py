@@ -57,6 +57,7 @@ class NotebookTabBase(Frame):
             self.image_canvas.delete("IMG")
             self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
             self.resize(None)
+            self.master.set_title(Path(file_path).resolve().name)
             self.minutiae = []
             self.update_idletasks()
 

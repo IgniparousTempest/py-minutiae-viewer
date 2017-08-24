@@ -16,7 +16,7 @@ class Root(ThemedTk):
         else:
             self.set_theme("clearlooks")
 
-        self.title("Py Minutiae Viewer")
+        self.set_title()
         img = PhotoImage(file=Path(__file__).resolve().parent / 'images' / 'icon.png')
         self.iconphoto(True, img)
 
@@ -28,3 +28,12 @@ class Root(ThemedTk):
         editor_tab = MinutiaeEditorFrame(self)
         self.notebook.add(editor_tab, text="Minutiae Editor")
         self.notebook.add(Frame(self), text="MINDTCT")
+
+    def set_title(self, title: str=None):
+        """
+        Sets the main window's title. If a string is provided then the title will be set to 
+        "[string] - [programme name]". If None is supplied just the programme name is displayed.
+        :param title: The text to set as the title. 
+        """
+        text = "" if title is None else "{0} - ".format(title)
+        self.title(text + "Py Minutiae Viewer")
