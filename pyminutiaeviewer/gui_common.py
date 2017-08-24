@@ -23,6 +23,8 @@ class NotebookTabBase(Frame):
         self.minutiae = []
         self.image_minutiae = None
 
+        self.file_path = Path()
+
         self.image_raw = Image.new('RGBA', (512, 512), (255, 255, 255, 255))
         self.image = ImageTk.PhotoImage(self.image_raw)
 
@@ -57,12 +59,14 @@ class NotebookTabBase(Frame):
             self.image_canvas.delete("IMG")
             self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
             self.resize(None)
-            self.master.set_title(Path(file_path).resolve().name)
+            self.file_path = Path(file_path).resolve()
+            self.master.set_title(self.file_path.name)
             self.minutiae = []
             self.update_idletasks()
 
     def load_minutiae_file(self):
-        file_path = askopenfilename(filetypes=(("All minutiae files", ('*.min', '*.sim')),
+        file_path = askopenfilename(initialfile=self.file_path.stem,
+                                    filetypes=(("All minutiae files", ('*.min', '*.sim')),
                                                ("Simple minutiae file", '*.sim'),
                                                ("NBIST minutiae file", '*.min'),
                                                ("All files", "*.*")))

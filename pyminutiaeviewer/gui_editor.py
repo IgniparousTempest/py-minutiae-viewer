@@ -45,7 +45,8 @@ class MinutiaeEditorFrame(NotebookTabBase):
         self._update_minutiae_count()
 
     def save_minutiae_file(self):
-        file_path = asksaveasfilename(filetypes=(("Simple minutiae file", '*.sim'),
+        file_path = asksaveasfilename(initialfile=self.file_path.stem,
+                                      filetypes=(("Simple minutiae file", '*.sim'),
                                                  ("NBIST minutiae file", '*.min')))
         if file_path:
             # Select the correct file format
