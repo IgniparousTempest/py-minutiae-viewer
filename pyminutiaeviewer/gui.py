@@ -6,6 +6,7 @@ from tkinter.ttk import Notebook, Frame
 from ttkthemes import ThemedTk
 
 from pyminutiaeviewer.gui_editor import MinutiaeEditorFrame
+from pyminutiaeviewer.gui_mindtct import MindtctFrame
 
 
 class Root(ThemedTk):
@@ -25,9 +26,10 @@ class Root(ThemedTk):
 
         self.notebook = Notebook(self)
         self.notebook.grid(row=0, column=0, sticky=NSEW)
+        mindtct_tab = MindtctFrame(self)
         editor_tab = MinutiaeEditorFrame(self)
+        self.notebook.add(mindtct_tab, text="MINDTCT")
         self.notebook.add(editor_tab, text="Minutiae Editor")
-        self.notebook.add(Frame(self), text="MINDTCT")
 
     def set_title(self, title: str=None):
         """

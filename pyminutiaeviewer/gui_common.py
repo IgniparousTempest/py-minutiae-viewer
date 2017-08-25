@@ -2,7 +2,8 @@ import traceback
 from pathlib import Path
 from tkinter.filedialog import askopenfilename
 from tkinter.messagebox import showerror
-from tkinter.ttk import Frame, Button
+from tkinter.scrolledtext import ScrolledText
+from tkinter.ttk import Frame, Button, Label
 from tkinter import Canvas, NSEW, N, W, RAISED, E
 from typing import Tuple
 
@@ -105,6 +106,25 @@ class ControlsFrameBase(Frame):
         Frame.__init__(self, parent, relief=RAISED, borderwidth=1)
         self.open_fingerprint_image_button = Button(self, text="Open Fingerprint Image", command=load_fingerprint_func)
         self.open_fingerprint_image_button.grid(row=0, column=0, sticky=N + W + E)
+
+
+class MinutiaeFrameBase(Frame):
+    def __init__(self, parent):
+        Frame.__init__(self, parent)
+
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
+
+        self.open_fingerprint_image_button = Frame(self, relief=RAISED, borderwidth=1)
+        self.open_fingerprint_image_button.grid(row=0, column=0, sticky=NSEW)
+
+        self.open_fingerprint_image_button.columnconfigure(0, weight=1)
+
+        self.minutiae_file_label = Label(self.open_fingerprint_image_button, text="test")
+        self.minutiae_file_label.grid(row=0, column=0)
+
+        self.minutiae_file_label = ScrolledText(self)
+        self.minutiae_file_label.grid(row=1, column=0, sticky=NSEW)
 
 
 def aspect_ratio_for_scaling(canvas_size: Tuple[int, int], image_size: Tuple[int, int]) -> float:
