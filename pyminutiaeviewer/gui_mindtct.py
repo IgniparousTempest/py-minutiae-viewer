@@ -14,19 +14,47 @@ class MindtctFrame(NotebookTabBase):
         self.fp_brightness_var = IntVar()
         self.fp_contrast_var = IntVar()
         self.algorithm_var = IntVar()
+        self.image_width_var = IntVar()
+        self.image_height_var = IntVar()
+
+        self.display_settings_frame = InfoFrame(self, self.image_width_var, self.image_height_var)
+        self.display_settings_frame.grid(row=1, column=0, padx=4, sticky=N + W + E)
 
         self.display_settings_frame = DisplaySettingsFrame(self, self.quality_var, self.fp_opacity_var,
                                                            self.min_opacity_var)
-        self.display_settings_frame.grid(row=1, column=0, padx=4, sticky=N + W + E)
+        self.display_settings_frame.grid(row=2, column=0, padx=4, sticky=N + W + E)
 
         self.image_settings_frame = ImageSettingsFrame(self, self.fp_brightness_var, self.fp_contrast_var)
-        self.image_settings_frame.grid(row=2, column=0, padx=4, sticky=N + W + E)
+        self.image_settings_frame.grid(row=3, column=0, padx=4, sticky=N + W + E)
 
         self.algorithm_selection_frame = AlgorithmSelectionFrame(self, self.algorithm_var)
-        self.algorithm_selection_frame.grid(row=3, column=0, padx=4, sticky=N + W + E)
+        self.algorithm_selection_frame.grid(row=4, column=0, padx=4, sticky=N + W + E)
 
         self.buttons_frame = ButtonsFrame(self)
-        self.buttons_frame.grid(row=4, column=0, padx=4, sticky=N + W + E)
+        self.buttons_frame.grid(row=5, column=0, padx=4, sticky=N + W + E)
+
+
+class InfoFrame(LabelFrame):
+    def __init__(self, parent, width_var, height_var):
+        super(self.__class__, self).__init__(parent, text="Display Settings")
+
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+
+        self.width_label = Label(self, text="Width:")
+        self.width_label.grid(row=0, column=0)
+        self.height_label = Label(self, text="Height:")
+        self.height_label.grid(row=0, column=1)
+
+        self.width_entry = Entry(self, textvariable=width_var, justify='center', state='readonly', width=7)
+        self.width_entry.grid(row=1, column=0)
+        self.height_entry = Entry(self, textvariable=height_var, justify='center', state='readonly', width=7)
+        self.height_entry.grid(row=1, column=1)
+
+        self.total_minutiae_label = Label(self, text="Total Minutiae Detected:")
+        self.total_minutiae_label.grid(row=2, column=0, columnspan=2)
+        self.total_minutiae_entry = Entry(self, textvariable=width_var, justify='center', state='readonly', width=11)
+        self.total_minutiae_entry.grid(row=3, column=0, columnspan=2)
 
 
 class DisplaySettingsFrame(LabelFrame):
