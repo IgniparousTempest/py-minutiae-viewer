@@ -54,7 +54,7 @@ class InfoFrame(LabelFrame):
         self.total_minutiae_label = Label(self, text="Total Minutiae Detected:")
         self.total_minutiae_label.grid(row=2, column=0, columnspan=2)
         self.total_minutiae_entry = Entry(self, textvariable=width_var, justify='center', state='readonly', width=11)
-        self.total_minutiae_entry.grid(row=3, column=0, columnspan=2)
+        self.total_minutiae_entry.grid(row=3, column=0, columnspan=2, pady=(0, 4))
 
 
 class DisplaySettingsFrame(LabelFrame):
@@ -86,7 +86,7 @@ class DisplaySettingsFrame(LabelFrame):
         self.min_opacity_entry.grid(row=4, column=1, sticky=E)
 
         self.min_opacity_scale = Scale(self, to=100, command=_make_whole(min_opacity_var), variable=min_opacity_var)
-        self.min_opacity_scale.grid(row=5, column=0, columnspan=2, sticky=W + E)
+        self.min_opacity_scale.grid(row=5, column=0, columnspan=2, sticky=W + E, pady=(0, 4))
 
 
 class ImageSettingsFrame(LabelFrame):
@@ -110,7 +110,7 @@ class ImageSettingsFrame(LabelFrame):
         self.fp_contrast_entry.grid(row=2, column=1, sticky=E)
 
         self.fp_contrast_scale = Scale(self, to=100, command=_make_whole(fp_contrast_var), variable=fp_contrast_var)
-        self.fp_contrast_scale.grid(row=3, column=0, columnspan=2, sticky=W + E)
+        self.fp_contrast_scale.grid(row=3, column=0, columnspan=2, sticky=W + E, pady=(0, 4))
 
 
 class AlgorithmSelectionFrame(LabelFrame):
@@ -123,7 +123,7 @@ class AlgorithmSelectionFrame(LabelFrame):
         self.iafis_radio = Radiobutton(self, text="IAFIS", variable=algorithm_var, value=0)
         self.iafis_radio.grid(row=0, column=0)
         self.m1_radio = Radiobutton(self, text="M1", variable=algorithm_var, value=1)
-        self.m1_radio.grid(row=0, column=1)
+        self.m1_radio.grid(row=0, column=1, pady=(0, 4))
 
 
 class ButtonsFrame(LabelFrame):
@@ -135,16 +135,16 @@ class ButtonsFrame(LabelFrame):
         self.nfiq_var = IntVar()
 
         self.min_detect_button = Button(self, text="Min. Detect", command=None)
-        self.min_detect_button.grid(row=0, column=0)
+        self.min_detect_button.grid(row=0, column=0, pady=(0, 4))
 
         self.nfiq_score_button = Button(self, text="NFIQ Score", command=None)
         self.nfiq_score_button.grid(row=1, column=0)
 
-        self.nfiq_entry = Entry(self, textvariable=self.nfiq_var, justify='center', state='disabled', width=3)
-        self.nfiq_entry.grid(row=2, column=0)
+        self.nfiq_entry = Entry(self, textvariable=self.nfiq_var, justify='center', state='disabled', width=5)
+        self.nfiq_entry.grid(row=2, column=0, pady=4)
 
         self.reset_button = Button(self, text="reset", command=None)
-        self.reset_button.grid(row=3, column=0)
+        self.reset_button.grid(row=3, column=0, pady=(0, 4))
 
 
 def _make_whole(variable: IntVar):
