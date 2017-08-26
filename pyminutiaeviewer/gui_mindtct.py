@@ -1,21 +1,10 @@
 from tkinter import N, W, E, DoubleVar, IntVar
 from tkinter.ttk import LabelFrame, Label, Entry, Scale, Radiobutton, Button
 
-from pyminutiaeviewer.gui_common import NotebookTabBase, ControlsFrameBase
+from pyminutiaeviewer.gui_common import NotebookTabBase
 
 
 class MindtctFrame(NotebookTabBase):
-    def __init__(self, parent):
-        super(self.__class__, self).__init__(parent)
-
-        self.minutiae = []
-
-        controls = ControlsFrame(self, self.load_fingerprint_image)
-
-        self.set_controls(controls)
-
-
-class ControlsFrame(ControlsFrameBase):
     def __init__(self, parent, load_fingerprint_func):
         super(self.__class__, self).__init__(parent, load_fingerprint_func)
 
