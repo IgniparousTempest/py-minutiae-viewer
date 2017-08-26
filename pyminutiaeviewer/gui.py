@@ -9,7 +9,7 @@ from tkinter.ttk import Notebook
 from PIL import Image, ImageTk
 from ttkthemes import ThemedTk
 
-from pyminutiaeviewer.gui_common import scale_image_to_fit_minutiae_canvas
+from pyminutiaeviewer.gui_common import scale_image_to_fit_minutiae_canvas, MenuBar
 from pyminutiaeviewer.gui_editor import MinutiaeEditorFrame
 from pyminutiaeviewer.gui_mindtct import MindtctFrame
 from pyminutiaeviewer.minutia import Minutia
@@ -29,6 +29,9 @@ class Root(ThemedTk):
         self.set_title()
         img = ImageTk.PhotoImage(file=Path(__file__).resolve().parent / 'images' / 'icon.png')
         self.iconphoto(True, img)
+
+        self.menu_bar = MenuBar(self)
+        self.config(menu=self.menu_bar)
 
         self.rowconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
@@ -145,6 +148,12 @@ class Root(ThemedTk):
                 traceback.print_exc()
                 showerror("Save Minutiae File", "There was an error in saving the minutiae file.\n\n"
                                                 "The error message was:\n{}".format(e))
+
+    def exit_application(self):
+        """
+        Attempts to exit the application. 
+        """
+        self.destroy()
 
     def draw_minutiae(self):
         scaled_raw_image, ratio = scale_image_to_fit_minutiae_canvas(self.image_canvas, self.image_raw)

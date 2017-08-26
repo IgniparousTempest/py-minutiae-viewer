@@ -1,4 +1,5 @@
-from tkinter import Canvas, NSEW, N, W, RAISED, E
+from tkinter import Canvas, NSEW, N, W, RAISED, E, Menu
+from tkinter.messagebox import showinfo
 from tkinter.scrolledtext import ScrolledText
 from tkinter.ttk import Frame, Button, Label
 from typing import Tuple
@@ -72,6 +73,29 @@ class MinutiaeFrameBase(Frame):
 
         self.minutiae_file_label = ScrolledText(self)
         self.minutiae_file_label.grid(row=1, column=0, sticky=NSEW)
+
+
+class MenuBar(Menu):
+    def __init__(self, parent):
+        super(self.__class__, self).__init__(parent)
+
+        file_menu = Menu(self, tearoff=0)
+        file_menu.add_command(label="Open Fingerprint Image...", command=parent.load_fingerprint_image)
+        file_menu.add_command(label="Open Minutiae File...", command=parent.load_minutiae_file)
+        file_menu.add_command(label="Export Minutiae File...", command=parent.save_minutiae_file)
+        file_menu.add_separator()
+        file_menu.add_command(label="About", command=about_info_box)
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=parent.exit_application)
+        self.add_cascade(label="File", menu=file_menu)
+
+
+def about_info_box():
+    """
+    Constructs an about dialogue box.
+    :return: The about dialogue box.
+    """
+    return showinfo("About", "Written by Courtney Pitcher")
 
 
 def aspect_ratio_for_scaling(canvas_size: Tuple[int, int], image_size: Tuple[int, int]) -> float:
