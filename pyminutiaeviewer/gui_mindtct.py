@@ -1,7 +1,10 @@
 from tkinter import N, W, E, DoubleVar, IntVar
 from tkinter.ttk import LabelFrame, Label, Entry, Scale, Radiobutton, Button
 
-from pyminutiaeviewer.gui_common import NotebookTabBase
+from overrides import overrides
+
+from pyminutiaeviewer.gui_common import NotebookTabBase, validation_command, validate_float_between_0_and_1, \
+    validate_int_between_0_and_100, validate_int_between_neg_100_and_100
 
 
 class MindtctFrame(NotebookTabBase):
@@ -10,14 +13,18 @@ class MindtctFrame(NotebookTabBase):
 
         self.quality_var = DoubleVar()
         self.fp_opacity_var = IntVar()
+        self.fp_opacity_var.set(100)
         self.min_opacity_var = IntVar()
+        self.min_opacity_var.set(100)
         self.fp_brightness_var = IntVar()
         self.fp_contrast_var = IntVar()
         self.algorithm_var = IntVar()
         self.image_width_var = IntVar()
         self.image_height_var = IntVar()
+        self.minutiae_count_var = IntVar()
 
-        self.display_settings_frame = InfoFrame(self, self.image_width_var, self.image_height_var)
+        self.display_settings_frame = InfoFrame(self, self.image_width_var, self.image_height_var,
+                                                self.minutiae_count_var)
         self.display_settings_frame.grid(row=1, column=0, padx=4, sticky=N + W + E)
 
         self.display_settings_frame = DisplaySettingsFrame(self, self.quality_var, self.fp_opacity_var,
@@ -33,9 +40,14 @@ class MindtctFrame(NotebookTabBase):
         self.buttons_frame = ButtonsFrame(self)
         self.buttons_frame.grid(row=5, column=0, padx=4, sticky=N + W + E)
 
+    @overrides
+    def load_fingerprint_image(self, image):
+        self.image_width_var.set(image.width)
+        self.image_height_var.set(image.height)
+
 
 class InfoFrame(LabelFrame):
-    def __init__(self, parent, width_var, height_var):
+    def __init__(self, parent, width_var, height_var, minutiae_var):
         super(self.__class__, self).__init__(parent, text="Display Settings")
 
         self.columnconfigure(0, weight=1)
@@ -53,7 +65,7 @@ class InfoFrame(LabelFrame):
 
         self.total_minutiae_label = Label(self, text="Total Minutiae Detected:")
         self.total_minutiae_label.grid(row=2, column=0, columnspan=2)
-        self.total_minutiae_entry = Entry(self, textvariable=width_var, justify='center', state='readonly', width=11)
+        self.total_minutiae_entry = Entry(self, textvariable=minutiae_var, justify='center', state='readonly', width=11)
         self.total_minutiae_entry.grid(row=3, column=0, columnspan=2, pady=(0, 4))
 
 
@@ -64,7 +76,8 @@ class DisplaySettingsFrame(LabelFrame):
         self.quality_label = Label(self, text="Quality (Unit) > ", padding=(5, 5))
         self.quality_label.grid(row=0, column=0, sticky=W)
 
-        self.quality_entry = Entry(self, textvariable=quality_var, width=5)
+        validation = validation_command(parent, validate_float_between_0_and_1)
+        self.quality_entry = Entry(self, textvariable=quality_var, width=5, **validation)
         self.quality_entry.grid(row=0, column=1, sticky=E)
 
         self.quality_scale = Scale(self, to=1.0, command=_make_two_float(quality_var), variable=quality_var)
@@ -73,7 +86,8 @@ class DisplaySettingsFrame(LabelFrame):
         self.fp_opacity_label = Label(self, text="FP Opacity (%) > ", padding=(5, 5))
         self.fp_opacity_label.grid(row=2, column=0, sticky=W)
 
-        self.fp_opacity_entry = Entry(self, textvariable=fp_opacity_var, width=5)
+        validation = validation_command(parent, validate_int_between_0_and_100)
+        self.fp_opacity_entry = Entry(self, textvariable=fp_opacity_var, width=5, **validation)
         self.fp_opacity_entry.grid(row=2, column=1, sticky=E)
 
         self.fp_opacity_scale = Scale(self, to=100, command=_make_whole(fp_opacity_var), variable=fp_opacity_var)
@@ -82,7 +96,7 @@ class DisplaySettingsFrame(LabelFrame):
         self.min_opacity_label = Label(self, text="Min Opacity (%) > ", padding=(5, 5))
         self.min_opacity_label.grid(row=4, column=0, sticky=W)
 
-        self.min_opacity_entry = Entry(self, textvariable=min_opacity_var, width=5)
+        self.min_opacity_entry = Entry(self, textvariable=min_opacity_var, width=5, **validation)
         self.min_opacity_entry.grid(row=4, column=1, sticky=E)
 
         self.min_opacity_scale = Scale(self, to=100, command=_make_whole(min_opacity_var), variable=min_opacity_var)
@@ -96,20 +110,22 @@ class ImageSettingsFrame(LabelFrame):
         self.fp_brightness_label = Label(self, text="FP Brightness (%) > ", padding=(5, 5))
         self.fp_brightness_label.grid(row=0, column=0, sticky=W)
 
-        self.fp_brightness_entry = Entry(self, textvariable=fp_brightness_var, width=5)
+        validation = validation_command(parent, validate_int_between_neg_100_and_100)
+        self.fp_brightness_entry = Entry(self, textvariable=fp_brightness_var, width=5, **validation)
         self.fp_brightness_entry.grid(row=0, column=1, sticky=E)
 
-        self.fp_brightness_scale = Scale(self, to=100, command=_make_whole(fp_brightness_var),
+        self.fp_brightness_scale = Scale(self, from_=-100, to=100, command=_make_whole(fp_brightness_var),
                                          variable=fp_brightness_var)
         self.fp_brightness_scale.grid(row=1, column=0, columnspan=2, sticky=W + E)
 
         self.fp_contrast_label = Label(self, text="FP Contrast (%) > ", padding=(5, 5))
         self.fp_contrast_label.grid(row=2, column=0, sticky=W)
 
-        self.fp_contrast_entry = Entry(self, textvariable=fp_contrast_var, width=5)
+        self.fp_contrast_entry = Entry(self, textvariable=fp_contrast_var, width=5, **validation)
         self.fp_contrast_entry.grid(row=2, column=1, sticky=E)
 
-        self.fp_contrast_scale = Scale(self, to=100, command=_make_whole(fp_contrast_var), variable=fp_contrast_var)
+        self.fp_contrast_scale = Scale(self, from_=-100, to=100, command=_make_whole(fp_contrast_var),
+                                       variable=fp_contrast_var)
         self.fp_contrast_scale.grid(row=3, column=0, columnspan=2, sticky=W + E, pady=(0, 4))
 
 

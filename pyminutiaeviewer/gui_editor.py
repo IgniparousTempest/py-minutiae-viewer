@@ -32,7 +32,7 @@ class MinutiaeEditorFrame(NotebookTabBase):
         self.info_frame.grid(row=3, column=0, padx=4, sticky=N + W + E)
 
     @overrides
-    def load_fingerprint_image(self):
+    def load_fingerprint_image(self, image):
         self._update_minutiae_count()
 
     @overrides

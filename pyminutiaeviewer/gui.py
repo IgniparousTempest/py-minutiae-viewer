@@ -98,7 +98,7 @@ class Root(ThemedTk):
             self.minutiae = []
             self.update_idletasks()
 
-            self.tabs[self.notebook.index("current")].load_fingerprint_image()
+            self.tabs[self.notebook.index("current")].load_fingerprint_image(self.image_raw)
 
     def load_minutiae_file(self):
         file_path = askopenfilename(initialfile=self.file_path.stem,
