@@ -58,7 +58,7 @@ def _encode_nbist_format(minutiae: List[Minutia], image: Image.Image) -> str:
             raise CorruptFileError("Minutiae of unknown type '{}'".format(m))
 
         string += " {} :  {},  {} : {} :  {} :{} : This file is incomplete\n"\
-            .format(i, m.x, m.y, round(m.angle / 11.25), 0.999, minutia_type)
+            .format(i, m.x, m.y, round(m.angle / 11.25), m.quality, minutia_type)
 
     return string
 
@@ -82,6 +82,6 @@ def _encode_simple_format(minutiae: List[Minutia], image: Image) -> str:
 
         # TODO: If this project is upgraded to python 3.6+, use Formatted string literals.
         # TODO: See: https://www.python.org/dev/peps/pep-0498/
-        string += "{} {} {} {}\n".format(m.x, m.y, m.angle, minutia_type)
+        string += "{} {} {} {} {}\n".format(m.x, m.y, m.angle, minutia_type, m.quality)
 
     return string[:-1]

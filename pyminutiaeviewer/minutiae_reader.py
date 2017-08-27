@@ -76,7 +76,8 @@ def _parse_nbist_format(lines: List[str]) -> List[Minutia]:
             x=int(symbols[1]),
             y=int(symbols[2]),
             angle=float(symbols[3]) * 11.25,
-            minutia_type=minutia_type
+            minutia_type=minutia_type,
+            quality=float(symbols[4])
         ))
 
     # Ensure the number of minutiae read is the expected number:
@@ -110,7 +111,8 @@ def _parse_simple_format(lines: List[str]) -> List[Minutia]:
             x=int(symbols[0]),
             y=int(symbols[1]),
             angle=float(symbols[2]),
-            minutia_type=minutia_type
+            minutia_type=minutia_type,
+            quality=float(symbols[4])
         ))
 
     return minutiae

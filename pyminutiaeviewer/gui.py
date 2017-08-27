@@ -157,7 +157,7 @@ class Root(ThemedTk):
 
     def draw_minutiae(self):
         scaled_raw_image, ratio = scale_image_to_fit_minutiae_canvas(self.image_canvas, self.image_raw)
-        minutiae = [Minutia(int(m.x * ratio), int(m.y * ratio), m.angle, m.minutia_type) for m in self.minutiae]
+        minutiae = [Minutia(int(m.x * ratio), int(m.y * ratio), m.angle, m.minutia_type, m.quality) for m in self.minutiae]
         self.image_minutiae = draw_minutiae(scaled_raw_image, minutiae)
 
         self.image = ImageTk.PhotoImage(self.image_minutiae)

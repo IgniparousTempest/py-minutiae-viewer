@@ -105,7 +105,7 @@ class MinutiaeEditorFrame(NotebookTabBase):
         ((sx, sy), minutiae_type) = self.current_minutiae
         angle = math.degrees(math.atan2(y - sy, x - sx)) + 90
 
-        minutia = Minutia(round(sx), round(sy), angle, minutiae_type)
+        minutia = Minutia(round(sx), round(sy), angle, minutiae_type, 1.0)
 
         self.root.draw_single_minutia(minutia)
 
@@ -121,7 +121,7 @@ class MinutiaeEditorFrame(NotebookTabBase):
         ((px, py), minutiae_type) = self.current_minutiae
         angle = math.degrees(math.atan2(y - py, x - px)) + 90
 
-        self.root.minutiae.append(Minutia(round(px * scale_factor), round(py * scale_factor), angle, minutiae_type))
+        self.root.minutiae.append(Minutia(round(px * scale_factor), round(py * scale_factor), angle, minutiae_type, 1.0))
         self.current_minutiae = None
 
         self.root.draw_minutiae()

@@ -7,23 +7,26 @@ class MinutiaType(Enum):
 
 
 class Minutia(object):
-    def __init__(self, x: int, y: int, angle: float, minutia_type: MinutiaType):
+    def __init__(self, x: int, y: int, angle: float, minutia_type: MinutiaType, quality: float):
         """
         A DTO to encapsulate a fingerprint minutia.
         :param x: The x co-ordinate.
         :param y: The y co-ordinate.
         :param angle: The angle of the minutia.
-        :param minutia_type: The type of the minutia, either a ridge ending or a bifurcation
+        :param minutia_type: The type of the minutia, either a ridge ending or a bifurcation.
+        :param quality: The quality of the feature.
         """
         self.x = x
         self.y = y
         self.angle = angle
         self.minutia_type = minutia_type
+        self.quality = quality
 
     def __str__(self):
-        return "Minutia(x: {}, y: {}, angle: {}, minutia_type: {})".format(
+        return "Minutia(x: {}, y: {}, angle: {}, minutia_type: {}, confidence: {})".format(
             self.x,
             self.y,
             self.angle,
-            self.minutia_type.name
+            self.minutia_type.name,
+            self.quality
         )
