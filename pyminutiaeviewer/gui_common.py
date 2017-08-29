@@ -3,9 +3,11 @@ from tkinter.messagebox import showinfo
 from tkinter.scrolledtext import ScrolledText
 from tkinter.ttk import Frame, Button, Label, Widget
 from types import FunctionType
-from typing import Tuple
+from typing import Tuple, List
 
 from PIL import Image
+
+from pyminutiaeviewer.minutia import Minutia
 
 
 class NotebookTabBase(Frame):
@@ -56,12 +58,20 @@ class NotebookTabBase(Frame):
         """
         pass
 
-    def drawing(self, image: Image):
+    def fingerprint_drawing(self, image: Image) -> Image:
         """
         The function the root calls to draw on to.
         :param image: The image to draw on to.
+        :return: The edited image.
         """
         return image
+
+    def minutiae_filtering(self, minutiae: List[Minutia]) -> List[Minutia]:
+        """
+        The function the root calls to allow modules to refine the minutiae to be shown.
+        :param minutiae: The image to draw on to.
+        """
+        return minutiae
 
 
 class MinutiaeFrameBase(Frame):

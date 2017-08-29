@@ -40,8 +40,9 @@ class Root(ThemedTk):
 
         self.file_path = Path()
 
-        self.image_minutiae = None
         self.image_raw = Image.new('RGBA', (512, 512), (255, 255, 255, 255))
+        self.image_fingerprint = self.image_raw
+        self.image_minutiae = None
         self.image = ImageTk.PhotoImage(self.image_raw)
 
         self.image_canvas = Canvas(self, bd=0, highlightthickness=0)
@@ -74,31 +75,27 @@ class Root(ThemedTk):
         self.title(text + "Py Minutiae Viewer")
 
     def redraw(self, _=None):
-        if self.image_minutiae is not None:
-            self.draw_minutiae()
-            return
-
         im = self.image_raw.copy()
 
         # Apply drawing from each active tab
         for tab in self.tabs:
-            im = tab.drawing(im)
+            im = tab.fingerprint_drawing(im)
 
         # Scale image to fit canvas
-        resized, _ = scale_image_to_fit_minutiae_canvas(self.image_canvas, im)
-        self.image = ImageTk.PhotoImage(resized)
+        im, _ = scale_image_to_fit_minutiae_canvas(self.image_canvas, im)
+        self.image_fingerprint = im
+        self.image = ImageTk.PhotoImage(self.image_fingerprint)
         self.image_canvas.delete("IMG")
         self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
+
+        # Draw minutiae
+        self.draw_minutiae()
 
     def load_fingerprint_image(self):
         file_path = askopenfilename(filetypes=(("Image files", ('*.bmp', '*.jpeg', '*.jpg', '*.png')),
                                                ("All files", "*.*")))
         if file_path:
             self.image_raw = Image.open(file_path).convert("RGBA")
-            self.image = ImageTk.PhotoImage(self.image_raw)
-            self.image_minutiae = None
-            self.image_canvas.delete("IMG")
-            self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
             self.redraw()
             self.file_path = Path(file_path).resolve()
             self.set_title(self.file_path.name)
@@ -163,24 +160,32 @@ class Root(ThemedTk):
         self.destroy()
 
     def draw_minutiae(self):
-        scaled_raw_image, ratio = scale_image_to_fit_minutiae_canvas(self.image_canvas, self.image_raw)
-        minutiae = [Minutia(int(m.x * ratio), int(m.y * ratio), m.angle, m.minutia_type, m.quality) for m in
-                    self.minutiae]
-        self.image_minutiae = draw_minutiae(scaled_raw_image, minutiae)
 
-        self.image = ImageTk.PhotoImage(self.image_minutiae)
+        # Apply filtering from each active module
+        minutiae = self.minutiae
+        for tab in self.tabs:
+            minutiae = tab.minutiae_filtering(minutiae)
+
+        # Scale minutiae
+        ratio = self.image_fingerprint.width / self.image_raw.width
+        minutiae = [Minutia(int(m.x * ratio), int(m.y * ratio), m.angle, m.minutia_type, m.quality) for m in minutiae]
+
+        im = Image.new('RGBA', self.image_fingerprint.size, (0, 0, 0, 0))
+        self.image_minutiae = draw_minutiae(im, minutiae)
+
+        im = self.image_fingerprint.copy()
+        im.paste(self.image_minutiae, (0, 0), self.image_minutiae)
+        self.image = ImageTk.PhotoImage(im)
         self.image_canvas.delete("IMG")
         self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
         self.update_idletasks()
 
     def draw_single_minutia(self, minutia: Minutia):
-        if self.image_minutiae is None:
-            resized, _ = scale_image_to_fit_minutiae_canvas(self.image_canvas, self.image_raw)
-            temp_image = draw_minutiae(resized, [minutia])
-        else:
-            temp_image = draw_minutiae(self.image_minutiae, [minutia])
+        temp_image = draw_minutiae(self.image_minutiae, [minutia])
+        im = self.image_fingerprint.copy()
+        im.paste(temp_image, (0, 0), temp_image)
 
-        self.image = ImageTk.PhotoImage(temp_image)
+        self.image = ImageTk.PhotoImage(im)
         self.image_canvas.delete("IMG")
         self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
         self.update_idletasks()
