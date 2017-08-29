@@ -3,7 +3,7 @@ from tkinter.ttk import LabelFrame, Label, Entry, Scale, Radiobutton, Button
 from types import LambdaType, FunctionType
 from typing import Union
 
-from PIL import ImageEnhance
+from PIL import ImageEnhance, ImageOps
 from overrides import overrides
 
 from pyminutiaeviewer.gui_common import NotebookTabBase, validation_command, validate_float_between_0_and_1, \
@@ -21,7 +21,8 @@ class MindtctFrame(NotebookTabBase):
         self.min_opacity_var = IntVar()
         self.fp_brightness_var = IntVar()
         self.fp_contrast_var = IntVar()
-        self.algorithm_var = IntVar()
+        self.min_direction_convention_var = IntVar()
+        self.min_colour_convention_var = IntVar()
         self.image_width_var = IntVar()
         self.image_height_var = IntVar()
         self.minutiae_count_var = IntVar()
@@ -38,8 +39,9 @@ class MindtctFrame(NotebookTabBase):
         self.image_settings_frame = ImageSettingsFrame(self, self.fp_brightness_var, self.fp_contrast_var)
         self.image_settings_frame.grid(row=3, column=0, padx=4, sticky=N + W + E)
 
-        self.algorithm_selection_frame = AlgorithmSelectionFrame(self, self.algorithm_var)
-        self.algorithm_selection_frame.grid(row=4, column=0, padx=4, sticky=N + W + E)
+        self.conventions_selection_frame = ConventionsSelectionFrame(self, self.min_direction_convention_var,
+                                                                     self.min_colour_convention_var)
+        self.conventions_selection_frame.grid(row=4, column=0, padx=4, sticky=N + W + E)
 
         self.buttons_frame = ButtonsFrame(self, self.reset, self.extract_minutiae)
         self.buttons_frame.grid(row=5, column=0, padx=4, sticky=N + W + E)
@@ -55,7 +57,8 @@ class MindtctFrame(NotebookTabBase):
         self.min_opacity_var.set(0)
         self.fp_brightness_var.set(0)
         self.fp_contrast_var.set(0)
-        self.algorithm_var.set(0)
+        self.min_direction_convention_var.set(0)
+        self.min_colour_convention_var.set(0)
         self.minutiae_count_var.set(0)
 
     def reset(self):
@@ -71,9 +74,17 @@ class MindtctFrame(NotebookTabBase):
 
     def extract_minutiae(self):
         # TODO: Get the real image
-        minutiae = mindtct(self.root.image_raw)
+        im = self.root.image_raw.convert('L')
+        if self.min_colour_convention_var.get() == 1:
+            im = ImageOps.invert(im)
+        minutiae = mindtct(im)
+
+        # Set minutiae direction format:
+        if self.min_direction_convention_var.get() == 1:
+            for m in minutiae:
+                m.angle = (m.angle + 180) % 360
+
         self.root.minutiae = minutiae
-        self.restore_default_values()
         self.minutiae_count_var.set(len(minutiae))
 
         self.root.redraw()
@@ -193,17 +204,28 @@ class ImageSettingsFrame(LabelFrame):
         self.fp_contrast_scale.grid(row=3, column=0, columnspan=2, sticky=W + E, pady=(0, 4))
 
 
-class AlgorithmSelectionFrame(LabelFrame):
-    def __init__(self, parent, algorithm_var: IntVar):
-        super(self.__class__, self).__init__(parent)
+class ConventionsSelectionFrame(LabelFrame):
+    def __init__(self, parent, direction_var: IntVar, colour_var: IntVar):
+        super(self.__class__, self).__init__(parent, text="Extraction Settings")
 
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
-        self.iafis_radio = Radiobutton(self, text="IAFIS", variable=algorithm_var, value=0)
-        self.iafis_radio.grid(row=0, column=0)
-        self.m1_radio = Radiobutton(self, text="M1", variable=algorithm_var, value=1)
-        self.m1_radio.grid(row=0, column=1, pady=(0, 4))
+        self.fp_contrast_label = Label(self, text="Minutiae Format:")
+        self.fp_contrast_label.grid(row=0, column=0, columnspan=2, sticky=W, pady=(0, 4))
+
+        self.iafis_radio = Radiobutton(self, text="IAFIS", variable=direction_var, value=0)
+        self.iafis_radio.grid(row=1, column=0)
+        self.m1_radio = Radiobutton(self, text="M1", variable=direction_var, value=1)
+        self.m1_radio.grid(row=1, column=1, pady=(0, 4))
+
+        self.fp_contrast_label = Label(self, text="Ridge Colour:")
+        self.fp_contrast_label.grid(row=2, column=0, columnspan=2, sticky=W, pady=(0, 4))
+
+        self.iafis_radio = Radiobutton(self, text="White", variable=colour_var, value=0)
+        self.iafis_radio.grid(row=3, column=0)
+        self.m1_radio = Radiobutton(self, text="Black", variable=colour_var, value=1)
+        self.m1_radio.grid(row=3, column=1, pady=(0, 4))
 
 
 class ButtonsFrame(LabelFrame):

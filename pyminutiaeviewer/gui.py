@@ -1,3 +1,4 @@
+import copy
 import platform
 import traceback
 from pathlib import Path
@@ -162,7 +163,7 @@ class Root(ThemedTk):
     def draw_minutiae(self):
 
         # Apply filtering from each active module
-        minutiae = self.minutiae
+        minutiae = [m.copy() for m in self.minutiae]
         for tab in self.tabs:
             minutiae = tab.minutiae_filtering(minutiae)
 
