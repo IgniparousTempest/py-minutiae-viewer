@@ -1,3 +1,4 @@
+import copy
 from enum import Enum
 
 
@@ -21,6 +22,9 @@ class Minutia(object):
         self.angle = angle
         self.minutia_type = minutia_type
         self.quality = quality
+
+    def copy(self) -> 'Minutia':
+        return copy.deepcopy(self)
 
     def __str__(self):
         return "Minutia(x: {}, y: {}, angle: {}, minutia_type: {}, confidence: {})".format(
