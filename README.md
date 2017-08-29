@@ -12,6 +12,10 @@ There are two modes:
 
 ## Screenshots
 
+![Screenshot of Editor Mode](.readme/Screenshot_mindtct.png)
+
+The above screenshot shows the application in `extraction mode`. Various settings can be set to extract the minutiae using `mindtct`.
+
 ![Screenshot of Editor Mode](.readme/Screenshot_editor.png)
 
 The above screenshot shows the application in `editor mode`, the minutiae have been detected with an external minutiae detection algorithm. Now false positives are being removed and false negatives are being labeled.
