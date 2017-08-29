@@ -1,15 +1,20 @@
 from tkinter import N, W, E, DoubleVar, IntVar
 from tkinter.ttk import LabelFrame, Label, Entry, Scale, Radiobutton, Button
+from types import LambdaType, FunctionType
+from typing import Union
 
+from PIL import ImageEnhance
 from overrides import overrides
 
 from pyminutiaeviewer.gui_common import NotebookTabBase, validation_command, validate_float_between_0_and_1, \
     validate_int_between_0_and_100, validate_int_between_neg_100_and_100
+from pyminutiaeviewer.mindtct import mindtct
 
 
 class MindtctFrame(NotebookTabBase):
     def __init__(self, parent, load_fingerprint_func):
         super(self.__class__, self).__init__(parent, load_fingerprint_func)
+        self.root = parent
 
         self.quality_var = DoubleVar()
         self.fp_opacity_var = IntVar()
@@ -37,13 +42,50 @@ class MindtctFrame(NotebookTabBase):
         self.algorithm_selection_frame = AlgorithmSelectionFrame(self, self.algorithm_var)
         self.algorithm_selection_frame.grid(row=4, column=0, padx=4, sticky=N + W + E)
 
-        self.buttons_frame = ButtonsFrame(self)
+        self.buttons_frame = ButtonsFrame(self, self.reset, self.extract_minutiae)
         self.buttons_frame.grid(row=5, column=0, padx=4, sticky=N + W + E)
+
+    def reset(self):
+        """
+        Resets all the controls. And redraws the image.
+        """
+
+        # Reset sliders:
+        self.quality_var.set(0.0)
+        self.fp_opacity_var.set(100)
+        self.min_opacity_var.set(100)
+        self.fp_brightness_var.set(0)
+        self.fp_contrast_var.set(0)
+        self.algorithm_var.set(0)
+        self.minutiae_count_var.set(0)
+
+        # Redraw the image
+        self.root.redraw()
+
+    def extract_minutiae(self):
+        # TODO: Get the real image
+        minutiae = mindtct(self.root.image_raw)
+        self.root.minutiae = minutiae
+        self.root.redraw()
 
     @overrides
     def load_fingerprint_image(self, image):
         self.image_width_var.set(image.width)
         self.image_height_var.set(image.height)
+
+        self.reset()
+
+    @overrides
+    def drawing(self, image):
+        # Apply brightness settings
+        enhancer = ImageEnhance.Brightness(image)
+        image = enhancer.enhance(2.0 * (self.fp_brightness_var.get() + 100.0) / 200.0)
+
+        # Apply contrast setting
+        enhancer = ImageEnhance.Contrast(image)
+        image = enhancer.enhance(2.0 * (self.fp_contrast_var.get() + 100.0) / 200.0)
+
+        return image
 
 
 class InfoFrame(LabelFrame):
@@ -114,7 +156,8 @@ class ImageSettingsFrame(LabelFrame):
         self.fp_brightness_entry = Entry(self, textvariable=fp_brightness_var, width=5, **validation)
         self.fp_brightness_entry.grid(row=0, column=1, sticky=E)
 
-        self.fp_brightness_scale = Scale(self, from_=-100, to=100, command=_make_whole(fp_brightness_var),
+        self.fp_brightness_scale = Scale(self, from_=-100, to=100,
+                                         command=_functions(parent.root.redraw, _make_whole(fp_brightness_var)),
                                          variable=fp_brightness_var)
         self.fp_brightness_scale.grid(row=1, column=0, columnspan=2, sticky=W + E)
 
@@ -124,7 +167,8 @@ class ImageSettingsFrame(LabelFrame):
         self.fp_contrast_entry = Entry(self, textvariable=fp_contrast_var, width=5, **validation)
         self.fp_contrast_entry.grid(row=2, column=1, sticky=E)
 
-        self.fp_contrast_scale = Scale(self, from_=-100, to=100, command=_make_whole(fp_contrast_var),
+        self.fp_contrast_scale = Scale(self, from_=-100, to=100,
+                                       command=_functions(parent.root.redraw, _make_whole(fp_contrast_var)),
                                        variable=fp_contrast_var)
         self.fp_contrast_scale.grid(row=3, column=0, columnspan=2, sticky=W + E, pady=(0, 4))
 
@@ -143,14 +187,14 @@ class AlgorithmSelectionFrame(LabelFrame):
 
 
 class ButtonsFrame(LabelFrame):
-    def __init__(self, parent):
+    def __init__(self, parent, reset_func, minutiae_extraction_func):
         super(self.__class__, self).__init__(parent)
 
         self.columnconfigure(0, weight=1)
 
         self.nfiq_var = IntVar()
 
-        self.min_detect_button = Button(self, text="Min. Detect", command=None)
+        self.min_detect_button = Button(self, text="Min. Detect", command=minutiae_extraction_func)
         self.min_detect_button.grid(row=0, column=0, pady=(0, 4))
 
         self.nfiq_score_button = Button(self, text="NFIQ Score", command=None)
@@ -159,7 +203,7 @@ class ButtonsFrame(LabelFrame):
         self.nfiq_entry = Entry(self, textvariable=self.nfiq_var, justify='center', state='disabled', width=5)
         self.nfiq_entry.grid(row=2, column=0, pady=4)
 
-        self.reset_button = Button(self, text="reset", command=None)
+        self.reset_button = Button(self, text="reset", command=reset_func)
         self.reset_button.grid(row=3, column=0, pady=(0, 4))
 
 
@@ -169,7 +213,7 @@ def _make_whole(variable: IntVar):
     :param variable: The variable to maintain as a whole number.
     :return: The function as a lambda.
     """
-    return lambda _: variable.set('{0:d}'.format(round(variable.get())))
+    return lambda _=None: variable.set('{0:d}'.format(round(variable.get())))
 
 
 def _make_two_float(variable: DoubleVar):
@@ -178,4 +222,13 @@ def _make_two_float(variable: DoubleVar):
     :param variable: The variable to with the value to read and set.
     :return: The function as a lambda.
     """
-    return lambda _: variable.set('{0:.2f}'.format(variable.get()))
+    return lambda _=None: variable.set('{0:.2f}'.format(variable.get()))
+
+
+def _functions(*args: Union[FunctionType, LambdaType]):
+    """
+    Wraps multiple functions in a lambda to be executed sequentially when called.
+    :param args: The functions to execute.
+    :return: A lambda to execute the provided functions.
+    """
+    return lambda _=None: [f() for f in args]

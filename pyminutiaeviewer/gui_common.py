@@ -56,6 +56,13 @@ class NotebookTabBase(Frame):
         """
         pass
 
+    def drawing(self, image: Image):
+        """
+        The function the root calls to draw on to.
+        :param image: The image to draw on to.
+        """
+        return image
+
 
 class MinutiaeFrameBase(Frame):
     def __init__(self, parent):

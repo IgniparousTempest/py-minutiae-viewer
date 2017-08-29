@@ -47,7 +47,6 @@ class Root(ThemedTk):
         self.image_canvas = Canvas(self, bd=0, highlightthickness=0)
         self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
         self.image_canvas.grid(row=0, column=1, sticky=NSEW)
-        self.bind("<Configure>", self.resize)
 
         self.notebook = Notebook(self)
         self.notebook.grid(row=0, column=0, sticky=NSEW)
@@ -63,8 +62,9 @@ class Root(ThemedTk):
         self.image_canvas.bind("<B1-Motion>", self.on_canvas_mouse_left_drag)
         self.image_canvas.bind("<ButtonRelease-1>", self.on_canvas_mouse_left_release)
         self.image_canvas.bind("<Button-3>", self.on_canvas_mouse_right_click)
+        self.bind("<Configure>", self.redraw)
 
-    def set_title(self, title: str=None):
+    def set_title(self, title: str = None):
         """
         Sets the main window's title. If a string is provided then the title will be set to 
         "[string] - [programme name]". If None is supplied just the programme name is displayed.
@@ -73,12 +73,19 @@ class Root(ThemedTk):
         text = "" if title is None else "{0} - ".format(title)
         self.title(text + "Py Minutiae Viewer")
 
-    def resize(self, _):
+    def redraw(self, _=None):
         if self.image_minutiae is not None:
             self.draw_minutiae()
             return
 
-        resized, _ = scale_image_to_fit_minutiae_canvas(self.image_canvas, self.image_raw)
+        im = self.image_raw.copy()
+
+        # Apply drawing from each active tab
+        for tab in self.tabs:
+            im = tab.drawing(im)
+
+        # Scale image to fit canvas
+        resized, _ = scale_image_to_fit_minutiae_canvas(self.image_canvas, im)
         self.image = ImageTk.PhotoImage(resized)
         self.image_canvas.delete("IMG")
         self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
@@ -92,7 +99,7 @@ class Root(ThemedTk):
             self.image_minutiae = None
             self.image_canvas.delete("IMG")
             self.image_canvas.create_image(0, 0, image=self.image, anchor=N + W, tags="IMG")
-            self.resize(None)
+            self.redraw()
             self.file_path = Path(file_path).resolve()
             self.set_title(self.file_path.name)
             self.minutiae = []
@@ -157,7 +164,8 @@ class Root(ThemedTk):
 
     def draw_minutiae(self):
         scaled_raw_image, ratio = scale_image_to_fit_minutiae_canvas(self.image_canvas, self.image_raw)
-        minutiae = [Minutia(int(m.x * ratio), int(m.y * ratio), m.angle, m.minutia_type, m.quality) for m in self.minutiae]
+        minutiae = [Minutia(int(m.x * ratio), int(m.y * ratio), m.angle, m.minutia_type, m.quality) for m in
+                    self.minutiae]
         self.image_minutiae = draw_minutiae(scaled_raw_image, minutiae)
 
         self.image = ImageTk.PhotoImage(self.image_minutiae)
@@ -217,4 +225,3 @@ class Root(ThemedTk):
 
     def on_canvas_mouse_right_click(self, event):
         self.tabs[self.notebook.index('current')].on_canvas_mouse_right_click(event)
-
