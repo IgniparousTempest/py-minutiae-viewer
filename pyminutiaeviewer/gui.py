@@ -1,4 +1,3 @@
-import copy
 import platform
 import traceback
 from pathlib import Path
@@ -107,9 +106,10 @@ class Root(ThemedTk):
 
     def load_minutiae_file(self):
         file_path = askopenfilename(initialfile=self.file_path.stem,
-                                    filetypes=(("All minutiae files", ('*.min', '*.sim')),
+                                    filetypes=(("All minutiae files", ('*.min', '*.sim', '*.xyt')),
                                                ("Simple minutiae file", '*.sim'),
                                                ("NBIST minutiae file", '*.min'),
+                                               ("x y theta file", '*.xyt'),
                                                ("All files", "*.*")))
         if file_path:
             # Select the correct file format
@@ -117,6 +117,8 @@ class Root(ThemedTk):
                 reader = MinutiaeReader(MinutiaeFileFormat.SIMPLE)
             elif Path(file_path).suffix == '.min':
                 reader = MinutiaeReader(MinutiaeFileFormat.NBIST)
+            elif Path(file_path).suffix == '.xyt':
+                reader = MinutiaeReader(MinutiaeFileFormat.XYT)
             else:
                 showerror("Read Minutiae File", "The chosen file had an extension of '{}', which can't be interpreted."
                           .format(Path(file_path).suffix))
@@ -135,13 +137,16 @@ class Root(ThemedTk):
     def save_minutiae_file(self):
         file_path = asksaveasfilename(initialfile=self.file_path.stem,
                                       filetypes=(("Simple minutiae file", '*.sim'),
-                                                 ("NBIST minutiae file", '*.min')))
+                                                 ("NBIST minutiae file", '*.min'),
+                                                 ("x y theta file", '*.xyt')))
         if file_path:
             # Select the correct file format
             if Path(file_path).suffix == '.sim':
                 writer = MinutiaeEncoder(MinutiaeFileFormat.SIMPLE)
             elif Path(file_path).suffix == '.min':
                 writer = MinutiaeEncoder(MinutiaeFileFormat.NBIST)
+            elif Path(file_path).suffix == '.xyt':
+                writer = MinutiaeEncoder(MinutiaeFileFormat.XYT)
             else:
                 showerror("Save Minutiae File", "The chosen file had an extension of '{}', which can't be interpreted."
                           .format(Path(file_path).suffix))

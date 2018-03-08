@@ -11,6 +11,7 @@ class MinutiaeFileFormat(Enum):
     NBIST = "NBIST"
     MINDTCT = "MINDTCT"
     SIMPLE = "SIMPLE"
+    XYT = "XYT"
 
 
 class MinutiaeReader(object):
@@ -22,6 +23,8 @@ class MinutiaeReader(object):
             self._parser = _parse_nbist_format
         elif file_format == MinutiaeFileFormat.SIMPLE:
             self._parser = _parse_simple_format
+        elif file_format == MinutiaeFileFormat.XYT:
+            self._parser = _parse_xyt_format
         else:
             raise AttributeError("MinutiaeReader is not configured to read file format: {}".format(file_format))
 
@@ -113,6 +116,28 @@ def _parse_simple_format(lines: List[str]) -> List[Minutia]:
             angle=float(symbols[2]),
             minutia_type=minutia_type,
             quality=float(symbols[4])
+        ))
+
+    return minutiae
+
+
+def _parse_xyt_format(lines: List[str]) -> List[Minutia]:
+    """
+    Reads a xyt minutiae file.
+    :param lines: The lines of the text file.
+    :return: The minutiae.
+    """
+    minutiae = []
+
+    for line in lines:
+        symbols = line.split(' ')
+
+        minutiae.append(Minutia(
+            x=int(symbols[0]),
+            y=int(symbols[1]),
+            angle=float(symbols[2]),
+            minutia_type=MinutiaType.RIDGE_ENDING,
+            quality=float(symbols[3])
         ))
 
     return minutiae

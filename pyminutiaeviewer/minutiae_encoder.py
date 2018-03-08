@@ -16,6 +16,8 @@ class MinutiaeEncoder(object):
             self._encoder = _encode_nbist_format
         elif file_format == MinutiaeFileFormat.SIMPLE:
             self._encoder = _encode_simple_format
+        elif file_format == MinutiaeFileFormat.XYT:
+            self._encoder = _encode_xyt_format
         else:
             raise AttributeError("MinutiaeReader is not configured to read file format: {}".format(file_format))
 
@@ -83,5 +85,21 @@ def _encode_simple_format(minutiae: List[Minutia], image: Image) -> str:
         # TODO: If this project is upgraded to python 3.6+, use Formatted string literals.
         # TODO: See: https://www.python.org/dev/peps/pep-0498/
         string += "{} {} {} {} {}\n".format(m.x, m.y, m.angle, minutia_type, m.quality)
+
+    return string[:-1]
+
+
+def _encode_xyt_format(minutiae: List[Minutia], image: Image) -> str:
+    """
+    Encodes to a xyt minutiae file.
+    :param minutiae: The minutiae to encode.
+    :param image: The image the minutiae are from, provides metadata to encoding. This is unused.
+    :return: The string encoding.
+    """
+    string = ""
+
+    for m in minutiae:
+        print(m.quality)
+        string += "{} {} {} {}\n".format(m.x, m.y, int(m.angle % 180), int(m.quality * 100))
 
     return string[:-1]
