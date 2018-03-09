@@ -99,7 +99,6 @@ def _encode_xyt_format(minutiae: List[Minutia], image: Image) -> str:
     string = ""
 
     for m in minutiae:
-        print(m.quality)
         string += "{} {} {} {}\n".format(m.x, m.y, int(m.angle % 180), int(m.quality * 100))
 
     return string[:-1]
