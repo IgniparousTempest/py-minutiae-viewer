@@ -137,7 +137,7 @@ def _parse_xyt_format(lines: List[str]) -> List[Minutia]:
             y=int(symbols[1]),
             angle=float(symbols[2]),
             minutia_type=MinutiaType.RIDGE_ENDING,
-            quality=float(symbols[3])
+            quality=float(symbols[3]) / 100
         ))
 
     return minutiae

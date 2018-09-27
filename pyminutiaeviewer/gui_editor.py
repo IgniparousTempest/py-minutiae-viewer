@@ -138,13 +138,13 @@ class InfoFrame(LabelFrame):
         self.bifurcation_label = Label(self, text="Bifurcation (LMB):")
         self.bifurcation_label.grid(row=1, column=0, sticky=W)
 
-        self.bifurcation_image = PhotoImage(file=Path(__file__).resolve().parent / 'images' / 'bifurcation.png')
+        self.bifurcation_image = PhotoImage(file=Path(__file__).resolve().parent / 'images' / 'bifurcation_white.png')
         self.bifurcation_image_label = Label(self, image=self.bifurcation_image)
         self.bifurcation_image_label.grid(row=2, column=0, sticky=W)
 
         self.ridge_ending_label = Label(self, text="Ridge Ending (CTRL + LMB):")
         self.ridge_ending_label.grid(row=3, column=0, sticky=W)
 
-        self.ridge_ending_image = PhotoImage(file=Path(__file__).resolve().parent / 'images' / 'ridge_ending.png')
+        self.ridge_ending_image = PhotoImage(file=Path(__file__).resolve().parent / 'images' / 'ridge_ending_white.png')
         self.ridge_ending_image_label = Label(self, image=self.ridge_ending_image)
         self.ridge_ending_image_label.grid(row=4, column=0, sticky=W)
