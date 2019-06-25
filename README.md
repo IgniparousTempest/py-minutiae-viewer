@@ -21,3 +21,17 @@ The above screenshot shows the application in `extraction mode`. Various setting
 The above screenshot shows the application in `editor mode`, the minutiae have been detected with an external minutiae detection algorithm. Now false positives are being removed and false negatives are being labeled.
 
 ## How to Use
+
+## Acknowledgements
+
+I would appreciate it if you mentioned this tool in any paper that benefitted from its use, here is the bibtex entry:
+
+    @misc{Pitcher2017,
+      author = {Pitcher, C.R.},
+      title = {Open Fingerprint Minutiae Viewer},
+      year = {2017},
+      publisher = {GitHub},
+      journal = {GitHub repository},
+      howpublished = {\url{https://github.com/IgniparousTempest/py-minutiae-viewer}},
+      commit = {bde52487d374ef102b348cc4521f71dcbefbd967}
+    }
