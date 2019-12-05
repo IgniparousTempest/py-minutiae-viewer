@@ -3,6 +3,12 @@ Open Fingerprint Minutiae Viewer is a cross-platform, open-source, multi-format 
 
 ## How to Install
 
+    git clone https://github.com/IgniparousTempest/py-minutiae-viewer
+    cd py-minutiae-viewer
+    sudo apt install python3-tk
+    pip3 install -r requirements.txt
+    python3 py-minutiae-viewer.py
+
 ## Modes
 
 There are two modes:
@@ -24,7 +30,7 @@ The above screenshot shows the application in `editor mode`, the minutiae have b
 
 ## Acknowledgements
 
-I would appreciate it if you mentioned this tool in any paper that benefitted from its use, here is the bibtex entry:
+Please cite this tool in any paper that benefitted from its use. That would make me happy :) Here is the bibtex entry:
 
     @misc{Pitcher2017,
       author = {Pitcher, C.R.},
